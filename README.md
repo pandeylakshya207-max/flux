@@ -37,5 +37,5 @@ flux is a full training engine - autograd, tensors, layers, optimizers, and a re
 | Model | Dataset | Accuracy |
 |-------|---------|----------|
 | MLP | MNIST | 97.32% (10 epochs, Adam lr=1e-3) |
-| CNN | CIFAR-10 | TBD |
+| CNN | CIFAR-10 | 55-57% (10k subset, CPU only; full 50k needs GPU) |
 | Transformer char-LM | Shakespeare | val_loss 2.79 (2000 steps, 109K params) |
