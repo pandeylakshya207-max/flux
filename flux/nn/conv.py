@@ -107,3 +107,46 @@ class BatchNorm1D(Module):
 class Flatten(Module):
     def forward(self, x):
         return x.reshape(x.data.shape[0], -1)
+
+
+class MaxPool2D(Module):
+    def __init__(self, kernel_size=2, stride=None):
+        self.kernel_size = kernel_size
+        self.stride = stride if stride is not None else kernel_size
+
+    def forward(self, x):
+        import numpy as np
+        N, C, H, W = x.data.shape
+        k, s = self.kernel_size, self.stride
+        oH = (H - k) // s + 1
+        oW = (W - k) // s + 1
+        out_data = np.zeros((N, C, oH, oW))
+        mask = np.zeros_like(x.data)
+        for i in range(oH):
+            for j in range(oW):
+                region = x.data[:, :, i*s:i*s+k, j*s:j*s+k]
+                out_data[:, :, i, j] = region.max(axis=(2, 3))
+                max_vals = out_data[:, :, i, j][:, :, None, None]
+                local_mask = (region == max_vals)
+                mask[:, :, i*s:i*s+k, j*s:j*s+k] += local_mask
+        out = Tensor(out_data, requires_grad=x.requires_grad,
+                     _children=(x,), _op='maxpool2d')
+        def _backward():
+            if x.requires_grad:
+                x._init_grad()
+                for i in range(oH):
+                    for j in range(oW):
+                        region = x.data[:, :, i*s:i*s+k, j*s:j*s+k]
+                        max_vals = out_data[:, :, i, j][:, :, None, None]
+                        local_mask = (region == max_vals).astype(np.float64)
+                        local_mask /= local_mask.sum(axis=(2,3), keepdims=True).clip(min=1)
+                        x.grad[:, :, i*s:i*s+k, j*s:j*s+k] += (
+                            local_mask * out.grad[:, :, i, j][:, :, None, None]
+                        )
+        out._backward = _backward
+        return out
+
+    def parameters(self): return []
+
+    def __repr__(self):
+        return f'MaxPool2D(kernel={self.kernel_size}, stride={self.stride})'
