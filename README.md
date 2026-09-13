@@ -10,7 +10,7 @@ A deep learning training framework built from scratch in pure Python + NumPy.
 |-------|---------|--------|
 | MLP (784-256-128-10) | MNIST | 97.32% test accuracy (10 epochs, Adam) |
 | Transformer char-LM (109K params) | Shakespeare | val_loss 2.79 (2000 steps) |
-| CNN (Conv2D x2 + Linear) | CIFAR-10 | 55-57% (10k subset, CPU only) |
+| CNN (Conv2D x2 + Linear) | CIFAR-10 | 77.2% (full 50k, 321K params, Adam + StepLR, 7 epochs) |
 
 ## Architecture
 
