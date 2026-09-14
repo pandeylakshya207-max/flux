@@ -46,11 +46,13 @@ def test_export_dropout_becomes_identity(tmp_path):
     assert os.path.exists(path)
 
 def test_export_unsupported_raises(tmp_path):
-    from flux.nn.conv import Conv2D
-    model = Sequential(Conv2D(1, 4, 3))
+    from flux.nn.module import Module
+    class UnsupportedLayer(Module):
+        def forward(self, x): return x
+    model = Sequential(UnsupportedLayer())
     path = str(tmp_path / "bad.onnx")
     with pytest.raises(ValueError, match="Unsupported"):
-        export_onnx(model, input_shape=[1, 1, 8, 8], path=path)
+        export_onnx(model, input_shape=[1, 4], path=path)
 
 def test_export_deep_model(tmp_path):
     model = Sequential(
