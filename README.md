@@ -81,8 +81,8 @@ A deep learning training framework built from scratch in pure Python + NumPy.
 
 ## Test suite
 
-    148 tests across 8 test files
-    pytest tests/ - all pass in ~1.3s
+    189 tests across 15 test files
+    pytest tests/ - all pass in a few seconds
 
 ## Design decisions
 
